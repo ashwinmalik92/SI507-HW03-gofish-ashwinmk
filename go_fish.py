@@ -57,28 +57,52 @@ class Deck(object):
 				card = Card(suit,rank)
 				self.cards.append(card)
 
-	def deal(self,num_hands,num_cards): #2 hands, 5 cards
-		hands = []
-		x = 0
-		while x < num_hands :
-			for i in range(0,num_cards+1):
-				hands[x].add_card(self.pop_card())
-				#num_cards = num_cards - 1
-			num_hands = num_hands + 1
-class Hand:
+	# remove all pairs from hand
+	# params: number of hands, number of cards per hand
+	# returns: list of hands
+	def deal(self, num_hands=2, num_cards=-1):
+		# calculate total number of cards to be dealt
+		if num_cards == -1:
+			deal_cards = len(self.cards)
+		else:
+			deal_cards = num_hands * num_cards
+		# initialize list
+		dealt_hands = []
+		# deal # number of cards
+		while deal_cards > 0:
+			# distribute across Hands
+			for h in range(num_hands):
+				# check if any cards left in deck
+				if deal_cards > 0:
+					# check if Hand has been created
+					if len(dealt_hands) < num_hands:
+						# initialize Hand with first card
+						dealt_hands.append(Hand([self.pop_card()]))
+					else:
+						# move top card of Deck to Hand
+						dealt_hands[h].add_card(self.pop_card())
+					# counting down number of cards to deal
+					deal_cards -= 1
+		# return list of hands
+		return(dealt_hands)
+
+class Hand(object):
 	# create the Hand with an initial set of cards
 	# param: a list of cards
 	def __init__(self, init_cards):
-			self.cards = init_cards
-
+		self.cards = init_cards
+		
 	# add a card to the hand
 	# silently fails if the card is already in the hand
 	# param: the card to add
 	# returns: nothing
 	def add_card(self, card):
+		# create empty list
 		card_strs = []
-		for c in self.cards:
-			card_strs.append(c.__str__())
+		# loop through cards in hand, append string version of card to list
+		for d in self.cards:
+			card_strs.append(d.__str__()) # 
+		# if new card is not found in list, append it
 		if card.__str__() not in card_strs:
 			self.cards.append(card)
 
@@ -86,29 +110,41 @@ class Hand:
 	# param: the card to remove
 	# returns: the card, or None if the card was not in the Hand
 	def remove_card(self, card):
-		card_strs = []
-		for c in self.cards:
-			card_strs.append(c.__str__())
-		if card.__str__() in card_strs:
-			self.cards.remove(card)
-			return card
-		else:
-			return None
+		# loop through cards in hand
+		for i, card_hand in enumerate(self.cards):
+			# if card is found in list, remove it
+			if card_hand.__str__() == card.__str__():
+				self.cards.pop(i)
+				return(card_hand)
 
 	# draw a card from a deck and add it to the hand
 	# side effect: the deck will be depleted by one card
-	# param:the deck from which to draw
+	# param: the deck from which to draw
 	# returns: nothing
 	def draw(self, deck):
-		pop = deck.pop_card()
-		self.add_card(pop)
+		# draw a card from given deck
+		new_card = deck.pop_card()
+		# add card to hand
+		self.add_card(new_card)
 
-	def remove_pairs(self): #4,4,6,7,8,11,6
-		for card in self.cards:
-			current_card = card
-			print(card)
-			for card2 in self.cards:
-				if (card2.__str__() != card.__str__()):
-					if (card2.rank_num == card.rank_num):
-						self.remove_card(card)
-						self.remove_card(card2)
+	######## EXTRA CREDIT 2 - REMOVE PAIRS ########
+	# remove all pairs from hand
+	# param: nothing
+	# returns: nothing
+	def remove_pairs(self):
+		# create empty list
+		card_val = [] # our original list of cards
+		card_rem = [] # our manipulated list of cards for reference
+		# loop through cards in hand, append string version of card to lists
+		for c in self.cards:
+			card_val.append(c.rank)
+			card_rem.append(c.rank)
+		# loop through every card in reverse order, so that indexes do not change during operation
+		# reference for reversed(list(enumerate(list_variable))): https://stackoverflow.com/questions/529424/traverse-a-list-in-reverse-order-in-python
+		for c, card in reversed(list(enumerate(card_val))):
+			# if there is an even number of a specific card in a hand, remove all
+			# if there is an odd number of a specific card in a hand, leave one in hand
+			if card_rem.count(card) > (card_val.count(card) % 2):
+				# remove card
+				card_rem.pop(c)
+				self.cards.pop(c)
