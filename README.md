@@ -1,2 +1,6 @@
 # SI507-HW03-gofish-ashwinmk
-Homework 3 Extra Credit of F19 SI 507.
+Description goes here.
+
+[Collaborator - UM - Section - GitHub ID]
+
+Ashwin Malik - ashwinmk - Section 002 - ashwinmalik92
