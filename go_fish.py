@@ -91,6 +91,7 @@ class Hand(object):
 	# param: a list of cards
 	def __init__(self, init_cards):
 		self.cards = init_cards
+		self.books = []
 		
 	# add a card to the hand
 	# silently fails if the card is already in the hand
@@ -148,3 +149,61 @@ class Hand(object):
 				# remove card
 				card_rem.pop(c)
 				self.cards.pop(c)
+
+def play_gofish(AI = False):
+	# start game by initializing deck and dealing out cards
+	deck = Deck()
+	deck.shuffle()
+	hands = deck.deal(2, 7)
+	player1 = hands[0]
+	player2 = hands[1]
+	player = player1
+	oppo = player2
+	turn = 1
+
+	# loop until all cards are in books
+	while (len(player1.books) + len(player2.books) < 13):
+		event = ''
+		# print out list of current player's cards
+		print('Player {}\'s turn: These are your cards.'.format(turn))
+		for c in range(len(player.cards)):
+			print(player.cards[c])
+		# request card choice
+		if AI == False:
+			request = int(input('Player {}\'s turn: What card rank (1-13) would you like to request? '.format(turn)))
+		else:
+			request = player.cards[random.randint(0, len(player.cards) - 1)].rank
+
+		# look for matching cards in opponent's hand
+		loot = []
+		for i in range(4):
+			steal = oppo.remove_card(Card(i, request))
+			if steal:
+				loot.append(steal)
+		if len(loot) > 0:
+			# add to own hand
+			player.cards.extend(loot)
+			print('You stole {} cards!'.format(len(loot)))
+			event = 'steal'
+		elif len(deck.cards) > 0:
+			# none found, so draw from pool
+			player.draw(deck)
+			print('Took a card from the pool.')
+			event = 'pool'
+
+		# change turn
+		if player.cards[-1].rank == request and event == 'pool':
+			print('-------- End of turn, Player {} goes again --------'.format(turn))
+		else:
+			if turn == 1:
+				turn = 2
+				player = player2
+				oppo = player1
+			else:
+				turn = 1
+				player = player1
+				oppo = player2
+			print('-------- End of turn, Player {} goes next --------'.format(turn))
+
+# play the game
+play_gofish(True)
