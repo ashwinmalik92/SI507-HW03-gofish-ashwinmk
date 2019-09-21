@@ -150,27 +150,32 @@ class Hand(object):
 				card_rem.pop(c)
 				self.cards.pop(c)
 
-def play_gofish(AI = False):
+def play_gofish(num_players = 2, AI = False):
 	# start game by initializing deck and dealing out cards
 	deck = Deck()
 	deck.shuffle()
-	hands = deck.deal(2, 7)
-	player1 = hands[0]
-	player2 = hands[1]
-	player = player1
-	oppo = player2
-	turn = 1
+	players = deck.deal(num_players, 7)
+	turn = 0
+	book_count = 0
 
 	# loop until all cards are in books
-	while (len(player1.books) + len(player2.books) < 13):
+	while book_count < 13:
+		# some turn logic
 		event = ''
+		player = players[turn]
+		if turn + 1 == num_players:
+			oppo = players[0]
+		else:
+			oppo = players[turn + 1]
+
 		# print out list of current player's cards
-		print('Player {}\'s turn: These are your cards.'.format(turn))
+		print('Player {}\'s turn: These are your cards.'.format(turn + 1))
 		for c in range(len(player.cards)):
 			print(player.cards[c])
+
 		# request card choice
 		if AI == False:
-			request = int(input('Player {}\'s turn: What card rank (1-13) would you like to request? '.format(turn)))
+			request = int(input('Player {}\'s turn: What card rank (1-13) would you like to request? '.format(turn + 1)))
 		else:
 			request = player.cards[random.randint(0, len(player.cards) - 1)].rank
 
@@ -180,30 +185,35 @@ def play_gofish(AI = False):
 			steal = oppo.remove_card(Card(i, request))
 			if steal:
 				loot.append(steal)
+
 		if len(loot) > 0:
 			# add to own hand
 			player.cards.extend(loot)
-			print('You stole {} cards!'.format(len(loot)))
+			print('You stole {} card(s)!'.format(len(loot)))
 			event = 'steal'
 		elif len(deck.cards) > 0:
 			# none found, so draw from pool
 			player.draw(deck)
-			print('Took a card from the pool.')
+			print('You took a card from the pool.')
 			event = 'pool'
+		
+		# count books
+		book_count = 0
+		for p in range(num_players):
+			book_count += len(players[p].books)
 
-		# change turn
+		# end of turn
 		if player.cards[-1].rank == request and event == 'pool':
-			print('-------- End of turn, Player {} goes again --------'.format(turn))
+			# if player drew from pool and card matched request, player goes again
+			print('-------- End of turn, Player {} goes again --------'.format(turn + 1))
 		else:
-			if turn == 1:
-				turn = 2
-				player = player2
-				oppo = player1
-			else:
-				turn = 1
-				player = player1
-				oppo = player2
-			print('-------- End of turn, Player {} goes next --------'.format(turn))
+			# more turn logic
+			turn += 1
+			if turn >= num_players:
+				turn = 0
+			print('-------- End of turn, Player {} goes next --------'.format(turn + 1))
 
 # play the game
-play_gofish(True)
+# params: 	num_players: number of players (default: 2)
+# 			AI: set True for a bot-only game (default: False)
+play_gofish()
