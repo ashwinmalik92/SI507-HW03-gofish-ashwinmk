@@ -154,7 +154,7 @@ def play_gofish(num_players = 2, AI = False):
 	# start game by initializing deck and dealing out cards
 	deck = Deck()
 	deck.shuffle()
-	players = deck.deal(num_players, 7)
+	players = deck.deal(num_players, 7) #hands
 	turn = 0
 	book_count = 0
 
@@ -197,10 +197,38 @@ def play_gofish(num_players = 2, AI = False):
 			print('You took a card from the pool.')
 			event = 'pool'
 		
+		# if four cards of the same rank in a player's hand, add to book:
+
+		# dictionary of frequencies of ranks
+		rank_frequencies = {}
+		for i in range(len(player.cards)):
+			if player.cards[i].rank_num not in rank_frequencies:
+				rank_frequencies[player.cards[i].rank_num] = 0
+			rank_frequencies[player.cards[i].rank_num] += 1
+
+		rank_to_remove = 0
+		for rank in rank_frequencies:
+			if rank_frequencies[rank] == 4:
+				rank_to_remove = rank_frequencies[rank] 
+		
+		for i in range(len(player.cards)): 
+			if player.cards[i].rank_num == rank_to_remove:
+				player.books.append[palyer.cards[i]]
+				player.remove_card(player.cards[i])
+				print("Rank {} added to book".format(rank_to_remove))
+
+
+
+
+
+
+
 		# count books
 		book_count = 0
 		for p in range(num_players):
 			book_count += len(players[p].books)
+
+		
 
 		# end of turn
 		if player.cards[-1].rank == request and event == 'pool':
