@@ -206,11 +206,14 @@ def play_gofish(num_players = 2, AI = False):
 				rank_frequencies[player.cards[i].rank_num] = 0
 			rank_frequencies[player.cards[i].rank_num] += 1
 
+		print(rank_frequencies)
+
 		rank_to_remove = 0
 		for rank in rank_frequencies:
 			if rank_frequencies[rank] == 4:
 				rank_to_remove = rank_frequencies[rank] 
 		
+		print(rank_to_remove)
 		for i in range(len(player.cards)): 
 			if player.cards[i].rank_num == rank_to_remove:
 				player.books.append[palyer.cards[i]]
