@@ -189,7 +189,7 @@ def play_gofish(num_players = 2, AI = False):
 		if len(loot) > 0:
 			# add to own hand
 			player.cards.extend(loot)
-			print('You stole {} card(s)!'.format(len(loot)))
+			print('You took {} card(s)!'.format(len(loot)))
 			event = 'steal'
 		elif len(deck.cards) > 0:
 			# none found, so draw from pool
@@ -211,14 +211,19 @@ def play_gofish(num_players = 2, AI = False):
 		rank_to_remove = 0
 		for rank in rank_frequencies:
 			if rank_frequencies[rank] == 4:
-				rank_to_remove = rank_frequencies[rank] 
+				rank_to_remove = rank
 		
 		print(rank_to_remove)
-		for i in range(len(player.cards)): 
-			if player.cards[i].rank_num == rank_to_remove:
-				player.books.append[palyer.cards[i]]
-				player.remove_card(player.cards[i])
-				print("Rank {} added to book".format(rank_to_remove))
+		list_to_move = []
+		if rank_to_remove > 0:
+			for i in reversed(range(len(player.cards))):
+				if player.cards[i].rank_num == rank_to_remove:
+					card_move = player.remove_card(player.cards[i])
+					list_to_move.append(card_move)
+					print('moved')
+			player.books.append(list_to_move)
+			print(list_to_move)
+			print("Rank {} added to book".format(rank_to_remove))
 
 
 
