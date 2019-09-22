@@ -253,4 +253,5 @@ def play_gofish(num_players = 2, AI = False):
 # play the game
 # params: 	num_players: number of players (default: 2)
 # 			AI: set True for a bot-only game (default: False)
-play_gofish()
+num_players = int(input('How many players will be playing? '))
+play_gofish(num_players, False)
