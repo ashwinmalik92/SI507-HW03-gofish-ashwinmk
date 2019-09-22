@@ -167,7 +167,7 @@ def play_gofish(num_players = 2, AI = False):
 			oppo = players[0]
 		else:
 			oppo = players[turn + 1]
-
+		
 		# print out list of current player's cards
 		print('Player {}\'s turn: These are your cards.'.format(turn + 1))
 		for c in range(len(player.cards)):
@@ -177,7 +177,10 @@ def play_gofish(num_players = 2, AI = False):
 		if AI == False:
 			request = int(input('Player {}\'s turn: What card rank (1-13) would you like to request? '.format(turn + 1)))
 		else:
-			request = player.cards[random.randint(0, len(player.cards) - 1)].rank
+			if len(player.cards) > 0:
+				request = player.cards[random.randint(0, len(player.cards) - 1)].rank
+			else:
+				request = random.randint(1, 13)
 
 		# look for matching cards in opponent's hand
 		loot = []
@@ -197,49 +200,37 @@ def play_gofish(num_players = 2, AI = False):
 			print('You took a card from the pool.')
 			event = 'pool'
 		
-		# if four cards of the same rank in a player's hand, add to book:
-
 		# dictionary of frequencies of ranks
 		rank_frequencies = {}
 		for i in range(len(player.cards)):
 			if player.cards[i].rank_num not in rank_frequencies:
 				rank_frequencies[player.cards[i].rank_num] = 0
 			rank_frequencies[player.cards[i].rank_num] += 1
+		#print(rank_frequencies)
 
-		print(rank_frequencies)
-
+		# move full set of rank to book
 		rank_to_remove = 0
 		for rank in rank_frequencies:
 			if rank_frequencies[rank] == 4:
 				rank_to_remove = rank
-		
-		print(rank_to_remove)
+		#print(rank_to_remove)
 		list_to_move = []
 		if rank_to_remove > 0:
 			for i in reversed(range(len(player.cards))):
 				if player.cards[i].rank_num == rank_to_remove:
 					card_move = player.remove_card(player.cards[i])
 					list_to_move.append(card_move)
-					print('moved')
 			player.books.append(list_to_move)
-			print(list_to_move)
-			print("Rank {} added to book".format(rank_to_remove))
-
-
-
-
-
-
-
+			#print(list_to_move)
+			print("Rank {} added to book.".format(rank_to_remove))
+		
 		# count books
 		book_count = 0
 		for p in range(num_players):
 			book_count += len(players[p].books)
 
-		
-
 		# end of turn
-		if player.cards[-1].rank == request and event == 'pool':
+		if len(player.cards) > 0 and player.cards[-1].rank == request and event == 'pool':
 			# if player drew from pool and card matched request, player goes again
 			print('-------- End of turn, Player {} goes again --------'.format(turn + 1))
 		else:
@@ -248,6 +239,16 @@ def play_gofish(num_players = 2, AI = False):
 			if turn >= num_players:
 				turn = 0
 			print('-------- End of turn, Player {} goes next --------'.format(turn + 1))
+	
+	# end of game
+	print('-------- End of game, all cards in books --------')
+	winner = [0, 0]
+	for p in range(num_players):
+		print('Player {} finished with {} books.'.format(p + 1, len(players[p].books)))
+		if len(players[p].books) > winner[1]:
+			winner[0] = p
+			winner[1] = len(players[p].books)
+	print('Player {} wins!'.format(winner[0] + 1))
 
 # play the game
 # params: 	num_players: number of players (default: 2)
